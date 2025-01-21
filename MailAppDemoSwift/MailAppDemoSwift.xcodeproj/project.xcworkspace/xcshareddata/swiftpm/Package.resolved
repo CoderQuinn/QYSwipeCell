@@ -1,0 +1,15 @@
+{
+  "originHash" : "7e90314c388f2041df155071b098e1cb1b6dbca9cf67ab155d71308c2a163d98",
+  "pins" : [
+    {
+      "identity" : "mgswipetablecell",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MortimerGoro/MGSwipeTableCell.git",
+      "state" : {
+        "revision" : "2d02e9d228b4684eda87ea696cdb3dd77713e782",
+        "version" : "1.6.14"
+      }
+    }
+  ],
+  "version" : 3
+}

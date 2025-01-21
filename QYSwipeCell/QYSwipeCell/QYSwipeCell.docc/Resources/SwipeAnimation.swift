@@ -1,11 +1,10 @@
 //
 //  SwipeAnimation.swift
+//  Dola
 //
+//  Created by MagicianQuinn on 2025/1/9.
+//  Copyright © 2025 Orion Arm Pte. Ltd. All rights reserved.
 //
-//  Created by MagicianQuinn on 2025/1/18.
-//
-
-import Foundation
 
 // TODO: Support border, clip, rotate3D and so on...
 public enum SwipeTransition: Int {
@@ -138,26 +137,25 @@ public class SwipeAnimation {
         var easingValue: Double = 0
         switch easingFunction {
         case .linear:
-            easingValue = SwipeAnimation.easeLinear(t, b, c)
+            return SwipeAnimation.easeLinear(t, b, c)
         case .quadIn:
-            easingValue = SwipeAnimation.easeInQuad(t, b, c)
+            return SwipeAnimation.easeInQuad(t, b, c)
         case .quadOut:
-            easingValue = SwipeAnimation.easeOutQuad(t, b, c)
+            return SwipeAnimation.easeOutQuad(t, b, c)
         case .quadInOut:
-            easingValue = SwipeAnimation.easeInOutQuad(t, b, c)
+            return SwipeAnimation.easeInOutQuad(t, b, c)
         case .cubicIn:
-            easingValue = SwipeAnimation.easeInCubic(t, b, c)
+            return SwipeAnimation.easeInCubic(t, b, c)
         case .cubicOut:
-            easingValue = SwipeAnimation.easeOutCubic(t, b, c)
+            return SwipeAnimation.easeOutCubic(t, b, c)
         case .cubicInOut:
-            easingValue = SwipeAnimation.easeInOutCubic(t, b, c)
+            return SwipeAnimation.easeInOutCubic(t, b, c)
         case .bounceIn:
-            easingValue = SwipeAnimation.easeInBounce(t, b, c)
+            return SwipeAnimation.easeInBounce(t, b, c)
         case .bounceOut:
-            easingValue = SwipeAnimation.easeOutBounce(t, b, c)
+            return SwipeAnimation.easeOutBounce(t, b, c)
         case .bounceInOut:
-            easingValue = SwipeAnimation.easeInOutBounce(t, b, c)
+            return SwipeAnimation.easeInOutBounce(t, b, c)
         }
-        return easingValue
     }
 }

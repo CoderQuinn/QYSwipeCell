@@ -1,9 +1,10 @@
-//
-//  SwipeTableCell.swift
-//
-//
-//  Created by MagicianQuinn on 2025/1/10.
-//
+////
+////  SwipeTableCell.swift
+////  Dola
+////
+////  Created by MagicianQuinn on 2025/1/10.
+////  Copyright © 2025 Orion Arm Pte. Ltd. All rights reserved.
+////
 //
 import Foundation
 import UIKit
@@ -15,7 +16,8 @@ import UIKit
  */
 public class SwipeTableCell: UITableViewCell {
     typealias AnimationCompletion = (Bool) -> Void
-
+    
+    // MARK: Public
     public weak var swipeDelegate: SwipeTableCellDelegate?
 
     public var leftViews: [UIView]?
@@ -29,16 +31,19 @@ public class SwipeTableCell: UITableViewCell {
     // default is NO. Controls whether multiple cells can be swiped simultaneously
     public var allowsMultipleSwipe: Bool = false
     // default is YES. Controls whether swipe gesture is allowed when the touch starts into the swiped buttons
-    public var allowsSwipeWhenTappingUiews: Bool = false
+    public var allowsSwipeWhenTappingButtons: Bool = false
     // default is YES. Controls whether swipe gesture is allowed in opposite directions. NO value disables swiping in opposite direction once started in one direction
     public var allowsOppositeSwipe: Bool = false
     // default is NO.  Controls whether the cell selection/highlight status is preserved when expansion occurs
     public var preservesSelectionStatus: Bool = true
+
     /* default is NO. Controls whether dismissing a swiped cell when tapping outside of the cell generates a real touch event on the other cell.
      Default behaviour is the same as the Mail app on iOS. Enable it if you want to allow to start a new swipe while a cell is already in swiped in a single step.  */
     public var touchOnDismissSwipe: Bool = false
+
     /** Optional background color for swipe overlay. If not set, its inferred automatically from the cell contentView */
     public var swipeBackgroundColor: UIColor?
+
     /** Property to read or change the current swipe offset programmatically */
     public var swipeOffset: Double = 0
 
@@ -52,6 +57,7 @@ public class SwipeTableCell: UITableViewCell {
 
     var swipeOverlay: UIView?
     var swipeView: UIImageView?
+
     /** optional to use contentView alternative. Use this property instead of contentView to support animated views while swiping */
     public internal(set) lazy var swipeContentView: UIView? = {
         var view = UIView(frame: contentView.bounds)
@@ -63,18 +69,18 @@ public class SwipeTableCell: UITableViewCell {
 
     var leftView: SwipeButtonsView?
     var rightView: SwipeButtonsView?
+    var tableInputOverlay: SwipeTableInputOverlay?
+    var animationData: SwipeAnimationData?
+    var animationCompletion: AnimationCompletion?
+
     var allowSwipeRightToLeft: Bool = false
     var allowSwipeLeftToRight: Bool = false
-
-    var tableInputOverlay: SwipeTableInputOverlay?
     var overlayEnabled: Bool = false
     var previusSelectionStyle: UITableViewCell.SelectionStyle = .none
     var previusHiddenViews: Set<UIView> = .init()
     var previusAccessoryType: UITableViewCell.AccessoryType = .none
     var triggerStateChanges: Bool = false
 
-    var animatinonData: SwipeAnimationData?
-    var animationCompletion: AnimationCompletion?
     var displayLink: CADisplayLink?
     var firstSwipeState: SwipeState = .none
 
@@ -197,14 +203,14 @@ public class SwipeTableCell: UITableViewCell {
             rightSwipeSettings = SwipeSettings()
         }
 
-        animatinonData = SwipeAnimationData()
+        animationData = SwipeAnimationData()
         panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panHandler(gesture:)))
         addGestureRecognizer(panRecognizer!)
         panRecognizer?.delegate = self
         previusHiddenViews = Set<UIView>()
         swipeState = .none
         triggerStateChanges = true
-        allowsSwipeWhenTappingUiews = true
+        allowsSwipeWhenTappingButtons = true
         preservesSelectionStatus = false
         allowsOppositeSwipe = true
         firstSwipeState = .none
@@ -273,10 +279,10 @@ public class SwipeTableCell: UITableViewCell {
     }
 
     func createSwipeViewIfNeeded() {
-        let safeInset = getSafeInsets()
+        let safeInsets = getSafeInsets()
 
         if swipeOverlay == nil {
-            swipeOverlay = UIView(frame: CGRectMake(0, 0, CGRectGetWidth(bounds), CGRectGetHeight(bounds)))
+            swipeOverlay = UIView(frame: CGRectMake(0, 0, CGRectGetWidth(bounds), CGRectGetHeight(contentView.bounds)))
             fixRegionAndAccesoryViews()
             swipeOverlay!.isHidden = true
             swipeOverlay!.backgroundColor = backgroundColorForSwipe()
@@ -285,26 +291,40 @@ public class SwipeTableCell: UITableViewCell {
             swipeView = UIImageView(frame: swipeOverlay!.bounds)
             swipeView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             swipeView!.contentMode = .center
+            swipeView!.backgroundColor = .clear
             swipeView!.clipsToBounds = true
             swipeOverlay!.addSubview(swipeView!)
             contentView.addSubview(swipeOverlay!)
         }
         fetchButtonsIfNeed()
 
+        guard let swipeOverlay = swipeOverlay else { return }
+
         if let leftViews = leftViews, let leftSwipeSettings = leftSwipeSettings, leftView == nil && !leftViews.isEmpty {
-            leftView = SwipeButtonsView(buttons: leftViews, direction: SwipeDirection.leftToRight, swipeSettings: leftSwipeSettings, safeInset: safeInset.left)
-            leftView!.cell = self
-            leftView!.frame = CGRectMake(-CGRectGetWidth(leftView) + safeInset.left * (isRTLLocal() ? 1 : -1), leftSwipeSettings?.topMargin, CGRectGetWidth(leftView?.buttons), CGRectGetHeight(swipeOverlay) - leftSwipeSettings?.topMargin - leftSwipeSettings?.bottomMargin)
-            leftView!.autoresizingMask = [.flexibleRightMargin, .flexibleHeight]
-            swipeOverlay?.addSubview(leftView!)
+            leftView = SwipeButtonsView(buttons: leftViews, direction: SwipeDirection.leftToRight, swipeSettings: leftSwipeSettings, safeInset: safeInsets.left)
+            if let leftView = leftView {
+                leftView.cell = self
+                leftView.frame = CGRectMake(-CGRectGetWidth(leftView.bounds) + safeInsets.left * (isRTLLocal() ? 1 : -1), leftSwipeSettings.topMargin, CGRectGetWidth(leftView.bounds), CGRectGetHeight(swipeOverlay.bounds) - leftSwipeSettings.topMargin - leftSwipeSettings.bottomMargin)
+                leftView.autoresizingMask = [.flexibleRightMargin, .flexibleHeight]
+                swipeOverlay.addSubview(leftView)
+            }
         }
 
-        if rightView == nil && !rightViews.isEmpty {
-            rightView = SwipeButtonsView(buttons: rightViews, direction: SwipeDirection.rightToLeft, swipeSettings: rightSwipeSettings, safeInset: safeInset.right)
-            rightView?.cell = self
-            rightView?.frame = CGRectMake(CGRectGetWidth(swipeOverlay?.bounds) + safeInset.right * (isRTLLocal() ? 1 : -1), rightSwipeSettings?.topMargin, CGRectGetWidth(rightView?.bounds), CGRectGetHeight(swipeOverlay) - rightSwipeSettings?.topMargin - rightSwipeSettings?.bottomMargin)
-            rightView?.autoresizingMask = [.flexibleLeftMargin, .flexibleHeight]
-            swipeOverlay?.addSubview(rightView)
+        if let rightViews = rightViews, let rightSwipeSettings = rightSwipeSettings, rightView == nil && !rightViews.isEmpty {
+            rightView = SwipeButtonsView(buttons: rightViews, direction: SwipeDirection.rightToLeft, swipeSettings: rightSwipeSettings, safeInset: safeInsets.right)
+            if let rightView = rightView {
+                rightView.cell = self
+                rightView.frame = CGRectMake(CGRectGetWidth(swipeOverlay.bounds) + safeInsets.right * (isRTLLocal() ? 1 : -1), rightSwipeSettings.topMargin, CGRectGetWidth(rightView.bounds), CGRectGetHeight(swipeOverlay.bounds) - rightSwipeSettings.topMargin - rightSwipeSettings.bottomMargin)
+                rightView.autoresizingMask = [.flexibleLeftMargin, .flexibleHeight]
+                swipeOverlay.addSubview(rightView)
+            }
+        }
+
+        if let leftView = leftView, let leftSwipeSettings = leftSwipeSettings {
+            leftView.setSafeInsetAndExtendEdgeButton(safeInset: safeInsets.left, extended: leftSwipeSettings.expanLastButtonBySafeAreaInsets, isRTL: isRTLLocal())
+        }
+        if let rightView = rightView, let rightSwipeSettings = rightSwipeSettings {
+            rightView.setSafeInsetAndExtendEdgeButton(safeInset: safeInsets.right, extended: rightSwipeSettings.expanLastButtonBySafeAreaInsets, isRTL: isRTLLocal())
         }
     }
 
@@ -383,6 +403,29 @@ public class SwipeTableCell: UITableViewCell {
             removeGestureRecognizer(tapRecognizer)
         }
         tapRecognizer = nil
+    }
+
+    @objc private func animationTick(timer: CADisplayLink) {
+        guard let animationData = animationData else { return }
+
+        if animationData.start == 0.0 {
+            animationData.start = timer.timestamp
+        }
+        let elapsed = timer.timestamp - animationData.start
+        let completed = elapsed >= animationData.duration
+        if completed {
+            triggerStateChanges = true
+        }
+
+        if let animation = animationData.animation {
+            swipeOffset = animation.swipeAnimation(esapsed: elapsed, duration: animationData.duration, from: animationData.from, to: animationData.to)
+        }
+
+        // call animation completion and invalidate timer
+        if completed {
+            timer.invalidate()
+            invalidateDisplayLink()
+        }
     }
 
     func invalidateDisplayLink() {
@@ -477,29 +520,33 @@ public class SwipeTableCell: UITableViewCell {
         }
 
         swipeState = newState
-        swipeDelegate?.swipeTableCell(self, didChange: swipeState, gestureIsActive: isSwipeGestureActive)
+        swipeDelegate?.swipeTableCell(self, didChange: swipeState, gestureIsActive: isSwipeGestureActive())
     }
 
     // MARK: Swipe Animation
 
     func setSwipe(offset newOffset: Double) {
         let sign: Double = newOffset > 0 ? 1.0 : -1.0
-        let activeViews = sign < 0 ? rightView : leftView
-        let activeSettings: SwipeSettings = sign < 0 ? rightSwipeSettings : leftSwipeSettings
+        var activeViews: SwipeButtonsView? = sign < 0 ? rightView : leftView
+        var swipeSettings: SwipeSettings? = sign < 0 ? rightSwipeSettings : leftSwipeSettings
 
-        if activeSettings.enableSwipeBounces {
-            swipeOffset = newOffset
-            let maxUnbounceOffset = sign * CGRectGetWidth(activeViews?.bounds)
-            if (sign > 0 && newOffset > maxUnbounceOffset) || (sign < 0 && newOffset < maxUnbounceOffset) {
-                swipeOffset = maxUnbounceOffset + (newOffset - maxUnbounceOffset) * activeSettings.swipeBounceRate
+        guard let activeSettings = swipeSettings else { return }
+        if let activeViews = activeViews {
+            if activeSettings.enableSwipeBounces {
+                swipeOffset = newOffset
+                let maxUnbounceOffset = sign * CGRectGetWidth(activeViews.bounds)
+                if (sign > 0 && newOffset > maxUnbounceOffset) || (sign < 0 && newOffset < maxUnbounceOffset) {
+                    swipeOffset = maxUnbounceOffset + (newOffset - maxUnbounceOffset) * activeSettings.swipeBounceRate
+                }
+            } else {
+                let maxOffset = sign * CGRectGetWidth(activeViews.bounds)
+                swipeOffset = sign > 0 ? min(newOffset, maxOffset) : max(newOffset, maxOffset)
             }
-        } else {
-            let maxOffset = sign * CGRectGetWidth(activeViews?.buttons)
-            swipeOffset = sign > 0 ? min(newOffset, maxOffset) : max(newOffset, maxOffset)
         }
+
         let offset = fabs(swipeOffset)
 
-        if !activeViews || offset == 0 {
+        if activeViews == nil || offset == 0 {
             hideSwipeOverlayIfNeeded(including: true)
             targetOffset = 0
             updateState(newState: .none)
@@ -509,7 +556,7 @@ public class SwipeTableCell: UITableViewCell {
             showSwipeOverlayIfNeeded()
             let swipeThreshold = activeSettings.threshold
             let keepViews = activeSettings.keepButtonsSwiped
-            targetOffset = keepViews && offset > CGRectGetWidth(activeViews?.bounds) * swipeThreshold ? CGRectGetWidth(activeViews?.bounds) * sign : 0
+            targetOffset = keepViews && offset > CGRectGetWidth(activeViews!.bounds) * swipeThreshold ? CGRectGetWidth(activeViews!.bounds) * sign : 0
         }
 
         let onlyViews = activeSettings.onlySwipeButtons
@@ -517,31 +564,44 @@ public class SwipeTableCell: UITableViewCell {
         let safeInset = isRTLLocal() ? safeInsets.right : -safeInsets.left
         swipeView?.transform = CGAffineTransformMakeTranslation(safeInset + (onlyViews ? 0 : swipeOffset), 0)
 
-        let views: [SwipeButtonsView] = [leftView, rightView]
-        let settings: [SwipeSettings] = [leftSwipeSettings, rightSwipeSettings]
+        var curViews: [SwipeButtonsView] = .init()
+        var curSettings: [SwipeSettings] = .init()
 
-        for Int i = 0; i < 2; ++i {
-            let view = views[i]
-            if view == nil {
+        if let left = leftView {
+            curViews.append(left)
+        }
+        if let right = rightView {
+            curViews.append(right)
+        }
+
+        if let leftSwipeSettings = leftSwipeSettings {
+            curSettings.append(leftSwipeSettings)
+        }
+
+        if let rightSwipeSettings = rightSwipeSettings {
+            curSettings.append(rightSwipeSettings)
+        }
+
+        for i in 0 ... 1 {
+            if i > curViews.count || i > curSettings.count {
                 continue
             }
+            let view = curViews[i]
+            let setting = curSettings[i]
 
             // buttons view position
-            let translation = min(offset, CGRectGetWidth(view.bounds)) * sign + settings[i].offset * sign
+            let translation = min(offset, CGRectGetWidth(view.bounds)) * sign + setting.offset * sign
             view.transform = CGAffineTransformMakeTranslation(translation, 0)
 
             if view != activeViews { // only transition if active (perf.improvement)
                 continue
             }
 
-            var expand = false // TODO: support expand
-            if expand {
-            } else {
-                let t: Double = min(1.0, offset / CGRectGetWidth(view.bounds))
-                view.transtion(mode: settings[i].transition, t: t)
-                let state = i ? SwipeState.swipingLeftToRight : SwipeState.swipingRightToLeft
-                updateState(newState: state)
-            }
+            let t: Double = min(1.0, offset / CGRectGetWidth(view.bounds))
+            view.transtion(mode: setting.transition, t: t)
+            let state = i > 0 ? SwipeState.swipingLeftToRight : SwipeState.swipingRightToLeft
+            updateState(newState: state)
+            // TODO: support expand
         }
     }
 
@@ -551,7 +611,7 @@ public class SwipeTableCell: UITableViewCell {
 
     public func hideSwipe(animated: Bool, completion: ((Bool) -> Void)? = nil) {
         let animation = animated ? (swipeOffset > 0 ? leftSwipeSettings?.hideAnimation : rightSwipeSettings?.hideAnimation) : nil
-        setSwipeOffset(0, animation: animation, completion: completion)
+        setSwipeOffset(0, animation, completion)
     }
 
     public func showSwipe(direction: SwipeDirection, animated: Bool) {
@@ -560,27 +620,29 @@ public class SwipeTableCell: UITableViewCell {
 
     public func showSwipe(direction: SwipeDirection, animated: Bool, completion: ((Bool) -> Void)? = nil) {
         createSwipeViewIfNeeded()
-        allowSwipeLeftToRight = leftViews?.count > 0
-        allowSwipeRightToLeft = rightViews?.count > 0
+        if let leftViews = leftViews {
+            allowSwipeLeftToRight = leftViews.count > 0
+        }
+        if let rightViews = rightViews {
+            allowSwipeRightToLeft = rightViews.count > 0
+        }
 
         let view = direction == SwipeDirection.leftToRight ? leftView : rightView
         if let view = view {
             let s = direction == .leftToRight ? 1.0 : -1.0
             let animation = animated ? (direction == .leftToRight ? leftSwipeSettings?.showAnimation : rightSwipeSettings?.showAnimation) : nil
-            setSwipeOffset(CGRectGetWidth(view.bounds) * s, animation: animation, completion: completion)
+            setSwipeOffset(CGRectGetWidth(view.bounds) * s, animation, completion)
         }
     }
 
     public func setSwipeOffset(_ offset: CGFloat, _ animated: Bool, _ completion: ((Bool) -> Void)? = nil) {
         let animation = animated ? SwipeAnimation() : nil
-        setSwipeOffset(offset, animation: animation, completion: completion)
+        setSwipeOffset(offset, animation, completion)
     }
 
     public func setSwipeOffset(_ offset: CGFloat, _ animation: SwipeAnimation?, _ completion: ((Bool) -> Void)? = nil) {
-        if displayLink {
-            displayLink?.invalidate()
-            displayLink = nil
-        }
+        displayLink?.invalidate()
+        displayLink = nil
 
         if let completion = animationCompletion { // notify previous animation cancelled
             animationCompletion = nil
@@ -591,9 +653,9 @@ public class SwipeTableCell: UITableViewCell {
             createSwipeViewIfNeeded()
         }
 
-        if !animation {
+        guard let animation = animation else {
             swipeOffset = offset
-            if completion {
+            if let completion = completion {
                 completion(true)
             }
             return
@@ -601,13 +663,13 @@ public class SwipeTableCell: UITableViewCell {
 
         animationCompletion = completion
         triggerStateChanges = false
-        animatinonData?.from = swipeOffset
-        animatinonData?.to = offset
-        animatinonData?.duration = animation?.duration
-        animatinonData?.start = 0
-        animatinonData?.animation = animation
-        displayLink = CADisplayLink(target: self, selector: #selector(animationTick:))
-        displayLink?.add(to: .main, for: .common)
+        animationData?.from = swipeOffset
+        animationData?.to = offset
+        animationData?.duration = animation.duration
+        animationData?.start = 0
+        animationData?.animation = animation
+        displayLink = CADisplayLink(target: self, selector: #selector(animationTick(timer:)))
+        displayLink?.add(to: .main, forMode: .common)
     }
 
     // MARK: Public
@@ -644,15 +706,16 @@ public class SwipeTableCell: UITableViewCell {
         if panRecognizer?.state != .ended && panRecognizer?.state != .possible {
             panRecognizer?.isEnabled = false
             panRecognizer?.isEnabled = true
-            if swipeOffset {
+            if swipeOffset == 0 {
                 hideSwipe(animated: true)
             }
         }
     }
 
     func filterSwipe(offset: Double) -> Double {
-        var allowed = offset > 0 ? allowSwipeLeftToRight : allowSwipeRightToLeft
-        UIView *curViews = offset > 0 ? leftView : rightView
+        var offset = offset
+        let allowed = offset > 0 ? allowSwipeLeftToRight : allowSwipeRightToLeft
+        let curViews = offset > 0 ? leftView : rightView
         if curViews == nil || !allowed {
             offset = 0
         } else if !allowsOppositeSwipe && firstSwipeState == .swipingLeftToRight && offset < 0 {
@@ -665,7 +728,10 @@ public class SwipeTableCell: UITableViewCell {
 
     @objc private func tapHandler(gesture recognizer: UITapGestureRecognizer) {
         var hide = true
-        hide = swipeDelegate?.swipeTableCell(self, shouldHideSwipeOnTap: recognizer.location(in: self))
+        if let delegate = swipeDelegate {
+            hide = delegate.swipeTableCell(self, shouldHideSwipeOnTap: recognizer.location(in: self))
+        }
+
         if hide {
             hideSwipe(animated: true)
         }
@@ -686,10 +752,11 @@ public class SwipeTableCell: UITableViewCell {
             }
 
             if !allowsMultipleSwipe {
-                let cells = parentTableView()?.visibleCells
-                for cell in cells {
-                    if cell.isKind(of: SwipeTableCell.self) && cell != self {
-                        cell.cancelPanGesture()
+                if let cells = parentTableView()?.visibleCells {
+                    for cell in cells {
+                        if cell.isKind(of: SwipeTableCell.self), let cell = cell as? SwipeTableCell, cell != self {
+                            cell.cancelPanGesture()
+                        }
                     }
                 }
             }
@@ -698,18 +765,31 @@ public class SwipeTableCell: UITableViewCell {
             if firstSwipeState == .none {
                 firstSwipeState = offset > 0 ? .swipingLeftToRight : .swipingRightToLeft
             }
-            swipeOffset = filterSwipe(offset: offset)
+            setSwipe(offset: filterSwipe(offset: offset))
         } else {
             var expansion = false
             if expansion {
                 // TODO:
             } else {
-                let velocity = panRecognizer?.velocity(in: self).x
+                let velocity = gesture.velocity(in: self).x
                 let inertiaThreshold = 100.0
                 if velocity > inertiaThreshold {
-                    targetOffset = swipeOffset < 0 ? 0 : (leftView && leftSwipeSettings?.keepButtonsSwiped ? CGRectGetWidth(leftView?.bounds) : targetOffset)
+                    if swipeOffset < 0 {
+                        targetOffset = 0
+
+                    } else {
+                        if let leftView = leftView, let leftSwipeSettings = leftSwipeSettings, leftSwipeSettings.keepButtonsSwiped {
+                            targetOffset = CGRectGetWidth(leftView.bounds)
+                        }
+                    }
                 } else if velocity < -inertiaThreshold {
-                    targetOffset = swipeOffset > 0 ? 0 : (rightView && rightSwipeSettings?.keepButtonsSwiped ? -CGRectGetWidth(rightView?.bounds) : targetOffset)
+                    if swipeOffset > 0 {
+                        targetOffset = 0
+                    } else {
+                        if let rightView = rightView, let rightSwipeSettings = rightSwipeSettings, rightSwipeSettings.keepButtonsSwiped {
+                            targetOffset = -CGRectGetWidth(rightView.bounds)
+                        }
+                    }
                 }
                 targetOffset = filterSwipe(offset: targetOffset)
                 let settings = swipeOffset > 0 ? leftSwipeSettings : rightSwipeSettings
@@ -717,34 +797,35 @@ public class SwipeTableCell: UITableViewCell {
 
                 if targetOffset == 0 {
                     animation = settings?.hideAnimation
-                } else if fabs(swipeOffset) > fabs(targetOffset) {
+                } else if abs(swipeOffset) > abs(targetOffset) {
                     animation = settings?.stretchAnimation
                 } else {
                     animation = settings?.showAnimation
                 }
-                setSwipeOffset(targetOffset, animated: animation, completion: nil)
+                setSwipeOffset(targetOffset, animation, nil)
             }
             firstSwipeState = .none
         }
     }
 
-    func gestureRecognizerShouldBegin(gesture: UIGestureRecognizer) -> Bool {
+    override public func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
         if gesture == panRecognizer {
+            guard let panRecognizer = panRecognizer else { return false }
             if isEditing {
                 return false // do not swipe while editing table
             }
 
             // user is scrolling vertically
-            let transition = panRecognizer?.translation(in: self)
-            if fabs(transition.y) > fabs(transition.x) {
+            let translation = panRecognizer.translation(in: self)
+            if abs(translation.y) > abs(translation.x) {
                 return false
             }
 
             // user clicked outside the cell or in the buttons area
-            if swipeView {
-                let point = tapRecognizer?.location(in: swipeView)
-                if !CGRectContainsPoint(swipeView?.bounds, point) {
-                    return allowsSwipeWhenTappingUiews
+            if let swipeView = swipeView, let tapRecognizer = tapRecognizer {
+                let point = tapRecognizer.location(in: swipeView)
+                if !CGRectContainsPoint(swipeView.bounds, point) {
+                    return allowsSwipeWhenTappingButtons
                 }
             }
 
@@ -755,25 +836,27 @@ public class SwipeTableCell: UITableViewCell {
 
             // make a decision according to existing buttons or using the optional delegate
             if let swipeDelegate = swipeDelegate {
-                CGPoint curPoint = gesture.location(in: self)
-                if let allowLTR = swipeDelegate.swipeTableCell(self, canSwipe: .leftToRight, from: curPoint) {
+                let curPoint = panRecognizer.location(in: self)
+                let allowLTR = swipeDelegate.swipeTableCell(self, canSwipe: .leftToRight, from: curPoint)
+                if allowLTR {
                     allowSwipeLeftToRight = allowLTR
                 } else {
                     fetchButtonsIfNeed()
-                    allowSwipeLeftToRight = leftViews?.count > 0
+                    allowSwipeLeftToRight = leftViews!.count > 0
                 }
-
-                if let allowRTL = swipeDelegate.swipeTableCell(self, canSwipe: .rightToLeft, from: curPoint) {
+                let allowRTL = swipeDelegate.swipeTableCell(self, canSwipe: .rightToLeft, from: curPoint)
+                if allowRTL {
                     allowSwipeRightToLeft = allowRTL
                 } else {
                     fetchButtonsIfNeed()
-                    allowSwipeRightToLeft = rightViews?.count > 0
+                    allowSwipeRightToLeft = rightViews!.count > 0
                 }
             }
             return (allowSwipeLeftToRight && translation.x > 0) || (allowSwipeRightToLeft && translation.x < 0)
         } else if gesture == tapRecognizer {
-            let point = tapRecognizer?.location(in: swipeView)
-            return CGRectContainsPoint(swipeView?.bounds, point)
+            let point = gesture.location(in: swipeView)
+            guard let swipeView = swipeView else { return false }
+            return CGRectContainsPoint(swipeView.bounds, point)
         }
         return true
     }

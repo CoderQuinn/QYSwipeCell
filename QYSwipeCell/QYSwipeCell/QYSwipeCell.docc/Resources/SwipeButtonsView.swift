@@ -1,19 +1,26 @@
 //
 //  SwipeButtonsView.swift
-//
+//  Dola
 //
 //  Created by MagicianQuinn on 2025/1/13.
+//  Copyright © 2025 Orion Arm Pte. Ltd. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-class SwipeButtonsView: UIView {
+open class SwipeButtonsView: UIView {
     open weak var cell: SwipeTableCell?
     open var backgroundColorCopy: UIColor?
 
     var buttons: [UIView] = []
-    var container: UIView
+    lazy var container: UIView = {
+        var container = UIView(frame: bounds)
+        container.clipsToBounds = true
+        container.backgroundColor = .clear
+        return container
+    }()
+
     var fromLeft: Bool = false
     var direction: SwipeDirection = .leftToRight
     var buttonDistance: Double = 0
@@ -40,9 +47,6 @@ class SwipeButtonsView: UIView {
 
         fromLeft = direction == .leftToRight
         buttonDistance = swipeSettings.buttonsDistance
-        container = UIView(frame: bounds)
-        container.clipsToBounds = true
-        container.backgroundColor = .clear
         self.direction = direction
         self.safeInset = safeInset
 
@@ -80,7 +84,7 @@ class SwipeButtonsView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) {
+    public required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -142,8 +146,8 @@ class SwipeButtonsView: UIView {
     func handleClick(sender: UIView, from _: Bool) -> Bool {
         var autoHide = false
         guard let cell = cell else { return autoHide }
-        if sender.isKind(of: SwipeButton.self), let btn = sender as? SwipeButton {
-            autoHide = btn.callSwipeConvenienceCallback(cell: cell)
+        if sender.isKind(of: SwipeButton.self), let btn = sender as? SwipeButton, let callback = btn.callSwipeConvenienceCallback {
+            autoHide = callback(cell)
         }
 
         let index = buttons.firstIndex { button in
@@ -179,7 +183,7 @@ class SwipeButtonsView: UIView {
         }
     }
 
-    override func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         container.frame = bounds
     }

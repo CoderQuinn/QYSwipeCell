@@ -40,7 +40,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E48A38A22D3F94A80047BA11 /* SwipeTableCellKit */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = SwipeTableCellKit; sourceTree = "<group>"; };
+		668E44B12D3FF33000F4C146 /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); name = Resources; path = ../QYSwipeCell/QYSwipeCell/QYSwipeCell.docc/Resources; sourceTree = SOURCE_ROOT; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,7 +83,7 @@
 		11E203661A1A9B440084A446 /* MailAppDemoSwift */ = {
 			isa = PBXGroup;
 			children = (
-				E48A38A22D3F94A80047BA11 /* SwipeTableCellKit */,
+				668E44B12D3FF33000F4C146 /* Resources */,
 				11E203691A1A9B440084A446 /* AppDelegate.swift */,
 				11E2036B1A1A9B440084A446 /* MailViewController.swift */,
 				11E203891A1A9CEF0084A446 /* MailTableCell.swift */,
@@ -135,7 +135,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				E48A38A22D3F94A80047BA11 /* SwipeTableCellKit */,
+				668E44B12D3FF33000F4C146 /* Resources */,
 			);
 			name = MailAppDemoSwift;
 			productName = MailAppDemoSwift;
@@ -156,7 +156,7 @@
 				11E2037B1A1A9B440084A446 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E48A38A22D3F94A80047BA11 /* SwipeTableCellKit */,
+				668E44B12D3FF33000F4C146 /* Resources */,
 			);
 			name = MailAppDemoSwiftTests;
 			productName = MailAppDemoSwiftTests;
@@ -378,6 +378,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = MailAppDemoSwift/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -388,6 +389,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "mortimergoro.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -401,6 +403,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = MailAppDemoSwift/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -411,6 +414,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "mortimergoro.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;

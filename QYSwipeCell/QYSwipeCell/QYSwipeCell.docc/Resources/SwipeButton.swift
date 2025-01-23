@@ -26,24 +26,53 @@ open class SwipeButton: UIButton {
      */
     public convenience init(title: String, icon: UIImage?, backgroundColor color: UIColor?, insets: UIEdgeInsets, callback: SwipeButtonCallback? = nil) {
         self.init(frame: .zero)
-        
         backgroundColor = color
         titleLabel?.lineBreakMode = .byWordWrapping
         titleLabel?.textAlignment = .center
         setTitle(title, for: .normal)
         setTitleColor(UIColor.white, for: .normal)
         setImage(icon, for: .normal)
-        self.callSwipeConvenienceCallback = callback
-        setEdgeInsets(insets)
+        callSwipeConvenienceCallback = callback
+        setEdgeInsets(insets: insets)
     }
 
-    open func setPadding(_: CGFloat) {}
+    open func setPadding(padding: CGFloat) {
+        contentEdgeInsets = UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding)
+        sizeToFit()
+    }
 
-    open func setEdgeInsets(_: UIEdgeInsets) {}
+    open func setEdgeInsets(insets: UIEdgeInsets) {
+        contentEdgeInsets = insets
+        sizeToFit()
+    }
 
-    open func centerIconOverText() {}
+    open func centerIconOverText() {
+        centerIconOverText(withSpacing: 3.0)
+    }
 
     open func centerIconOverText(withSpacing _: CGFloat) {}
 
-    open func iconTintColor(_: UIColor?) {}
+    open func iconTintColor(tintColor: UIColor?) {
+        var currentIcon = imageView?.image
+        if currentIcon?.renderingMode != .alwaysTemplate {
+            currentIcon = currentIcon?.withRenderingMode(.alwaysTemplate)
+            setImage(currentImage, for: .normal)
+        }
+        self.tintColor = tintColor
+    }
+    
+    func isRTLLocal() -> Bool {
+        if #available(iOS 9.0, *) {
+            return UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft
+        } else if isAppExtension() {
+            return Locale.characterDirection(forLanguage: Locale.current.languageCode!) == .rightToLeft
+        } else {
+            return UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+        }
+    }
+    
+    func isAppExtension() -> Bool {
+        guard let path = Bundle.main.executablePath else { return false }
+        return path.range(of: ".appex/") != nil
+    }
 }

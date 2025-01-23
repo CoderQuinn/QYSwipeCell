@@ -16,8 +16,9 @@ import UIKit
  */
 public class SwipeTableCell: UITableViewCell {
     typealias AnimationCompletion = (Bool) -> Void
-    
+
     // MARK: Public
+
     public weak var swipeDelegate: SwipeTableCellDelegate?
 
     public var leftViews: [UIView]?

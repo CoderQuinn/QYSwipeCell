@@ -1,9 +1,9 @@
 //
 //  SwipeTableInputOverlay.swift
-//  Dola
+// 
 //
 //  Created by MagicianQuinn on 2025/1/13.
-//  Copyright © 2025 Orion Arm Pte. Ltd. All rights reserved.
+// 
 //
 
 import UIKit

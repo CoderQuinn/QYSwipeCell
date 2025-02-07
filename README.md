@@ -1,6 +1,6 @@
 # QYSwipeCell
-To be familiar with Swift and cell swiping, implement it by copying,  https://github.com/MortimerGoro/MGSwipeTableCell
-Respect it!
+
+To get familiar with Swift and cell swiping, implement it by referring to the repository: https://github.com/MortimerGoro/MGSwipeTableCell. With the greatest respect!
 
 ## License
 MIT License

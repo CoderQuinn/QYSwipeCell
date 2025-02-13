@@ -2,6 +2,9 @@
 
 To get familiar with Swift and cell swiping, implement it by referring to the repository: https://github.com/MortimerGoro/MGSwipeTableCell. With the greatest respect!
 
+# TODO
+TODO: Some bugs need bo be fixed and units test. After completing my job search, I will do it.
+
 ## License
 MIT License
 

@@ -3,7 +3,7 @@
 //
 //
 //  Created by MagicianQuinn on 2025/1/9.
-//  
+//
 //
 
 class SwipeAnimationData {

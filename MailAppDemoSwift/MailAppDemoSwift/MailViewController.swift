@@ -3,7 +3,6 @@
 //  MailAppDemoSwift
 //
 
-import MGSwipeTableCell
 import UIKit
 
 class MailData {
@@ -200,9 +199,11 @@ class MailViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
 
     func swipeTableCell(_ cell: SwipeTableCell, swipeButtonsFor direction: SwipeDirection, swipeSettings: SwipeSettings?) -> [UIView]? {
+        guard let indexPath = tableView.indexPath(for: cell) else { return [] }
         guard let swipeSettings = swipeSettings else { return [] }
         swipeSettings.transition = .static
-        let mail = mailForIndexPath(tableView.indexPath(for: cell)!)
+        
+        let mail = mailForIndexPath(indexPath)
         if direction == SwipeDirection.leftToRight {
             let color = UIColor(red: 0.0, green: 122 / 255.0, blue: 1.0, alpha: 1.0)
             let views = [

@@ -1,9 +1,9 @@
 //
 //  SwipeTableCellDelegate.swift
-// 
+//
 //
 //  Created by MagicianQuinn on 2025/1/10.
-// 
+//
 //
 
 import UIKit

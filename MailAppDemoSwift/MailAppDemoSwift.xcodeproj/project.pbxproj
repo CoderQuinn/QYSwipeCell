@@ -13,7 +13,6 @@
 		11E203741A1A9B440084A446 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11E203721A1A9B440084A446 /* LaunchScreen.xib */; };
 		11E203801A1A9B440084A446 /* MailAppDemoSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2037F1A1A9B440084A446 /* MailAppDemoSwiftTests.swift */; };
 		11E2038A1A1A9CEF0084A446 /* MailTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E203891A1A9CEF0084A446 /* MailTableCell.swift */; };
-		E48A38BB2D3FAEED0047BA11 /* MGSwipeTableCell in Frameworks */ = {isa = PBXBuildFile; productRef = E48A38BA2D3FAEED0047BA11 /* MGSwipeTableCell */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,7 +47,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E48A38BB2D3FAEED0047BA11 /* MGSwipeTableCell in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,7 +195,6 @@
 			);
 			mainGroup = 11E2035B1A1A9B440084A446;
 			packageReferences = (
-				E48A38B92D3FAEED0047BA11 /* XCRemoteSwiftPackageReference "MGSwipeTableCell" */,
 			);
 			productRefGroup = 11E203651A1A9B440084A446 /* Products */;
 			projectDirPath = "";
@@ -507,25 +504,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		E48A38B92D3FAEED0047BA11 /* XCRemoteSwiftPackageReference "MGSwipeTableCell" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/MortimerGoro/MGSwipeTableCell.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.6.14;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		E48A38BA2D3FAEED0047BA11 /* MGSwipeTableCell */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E48A38B92D3FAEED0047BA11 /* XCRemoteSwiftPackageReference "MGSwipeTableCell" */;
-			productName = MGSwipeTableCell;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 11E2035C1A1A9B440084A446 /* Project object */;
 }

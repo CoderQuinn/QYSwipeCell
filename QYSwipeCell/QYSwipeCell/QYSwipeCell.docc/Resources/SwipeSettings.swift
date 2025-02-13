@@ -1,9 +1,9 @@
 //
 //  SwipeSettings.swift
-// 
+//
 //
 //  Created by MagicianQuinn on 2025/1/9.
-// 
+//
 //
 
 public class SwipeSettings {

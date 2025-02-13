@@ -1,9 +1,9 @@
 //
 //  SwipeTableInputOverlay.swift
-// 
+//
 //
 //  Created by MagicianQuinn on 2025/1/13.
-// 
+//
 //
 
 import UIKit

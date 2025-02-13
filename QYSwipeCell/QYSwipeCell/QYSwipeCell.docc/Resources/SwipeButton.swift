@@ -1,9 +1,9 @@
 //
 //  SwipeButton.swift
-// 
+//
 //
 //  Created by MagicianQuinn on 2025/1/9.
-// 
+//
 //
 
 import Foundation
@@ -60,7 +60,7 @@ open class SwipeButton: UIButton {
         }
         self.tintColor = tintColor
     }
-    
+
     func isRTLLocal() -> Bool {
         if #available(iOS 9.0, *) {
             return UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft
@@ -70,7 +70,7 @@ open class SwipeButton: UIButton {
             return UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
         }
     }
-    
+
     func isAppExtension() -> Bool {
         guard let path = Bundle.main.executablePath else { return false }
         return path.range(of: ".appex/") != nil

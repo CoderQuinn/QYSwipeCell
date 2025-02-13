@@ -1,6 +1,6 @@
 //
 //  SwipeAnimation.swift
-//  Dola
+//  
 //
 //  Created by MagicianQuinn on 2025/1/9.
 //
